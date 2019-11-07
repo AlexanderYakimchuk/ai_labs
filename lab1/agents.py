@@ -89,6 +89,12 @@ class ModelBasedAgent(Agent):
         super().__init__(*args, **kwargs)
         self.map = self.build_map()
         self.temp_map = None
+        self.cur_step = 1
+
+    def move(self, pos: Position):
+        self.map[pos.x][pos.y] = self.cur_step
+        self._move(pos)
+        self.cur_step += 1
 
     def get_moves(self, check_func):
         moves = []

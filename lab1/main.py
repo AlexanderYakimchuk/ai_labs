@@ -4,8 +4,8 @@ from lab1.environment import Environment
 from lab1.utils import Position, show
 
 start_position = Position(1, 1)
-iterations = 1000
-maps = [choices.MAP1, choices.MAP2, choices.MAP3]
+iterations = 2000
+maps = [choices.MAP3]
 agents = (RandomAgent, ReflectiveAgent, ModelBasedAgent)
 
 if __name__ == "__main__":

@@ -64,11 +64,10 @@ class State(list):
         for i in range(1, SIZE ** 2):
             state[i] = i
         state.null = 0
-        print(state.__repr__())
         for _ in range(moves):
-            state = random.choice(state.get_possible_moves(with_return=False))
-            print(state.__repr__())
-        # state.prev_state = None
+            state = random.choice(state.get_possible_moves(with_return=True))
+            # print(state.__repr__())
+        state.prev_state = None
         state.depth = 0
         return state
 

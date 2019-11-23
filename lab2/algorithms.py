@@ -1,6 +1,8 @@
+from datetime import time
+
 from lab2.states import State
 import sys
-
+from time import time
 # sys.setrecursionlimit(2000)
 
 
@@ -8,16 +10,54 @@ class Algorithm:
     def __init__(self, iters=1):
         self.finish = None
         self.iters = iters
+        self.total_time = 0
+        self.best_time = float('inf')
+        self.worth_time = 0
+        self.total_steps = 0
+        self.best_steps = float('inf')
+        self.worth_steps = 0
 
     def find_finish_state(self, init_state):
         raise NotImplementedError
 
     def run(self):
         for _ in range(self.iters):
-            state = State.get_valid_init_state(moves=10)
+            self.finish = None
+            state = State.get_valid_init_state()
+            start = time()
             self.find_finish_state(state)
-            print(self.finish)
-            print(self.finish.depth)
+            end = time()
+            self.update_time_statistic(end - start)
+            self.update_steps_statistic(self.finish.depth)
+            # print('-' * 40)
+            # print(self.finish)
+            # print(self.finish.depth)
+
+    def update_steps_statistic(self, steps):
+        self.total_steps += steps
+        self.best_steps = min((self.best_steps, steps))
+        self.worth_steps = max((self.worth_steps, steps))
+
+    def update_time_statistic(self, time):
+        self.total_time += time
+        self.best_time = min((self.best_time, time))
+        self.worth_time = max((self.worth_time, time))
+
+    def show_statistic(self):
+        print('TIME')
+        print('-' * 40)
+        print(f'Average time: {self.total_time / self.iters}')
+        print(f'Best time: {self.best_time}')
+        print(f'Worth time: {self.worth_time}')
+        print('-' * 40)
+        print()
+        print('STEPS')
+        print('-' * 40)
+        print(f'Average steps: {self.total_steps / self.iters}')
+        print(f'Best steps: {self.best_steps}')
+        print(f'Worth steps: {self.worth_steps}')
+        print('-' * 40)
+
 
 
 class LDFS(Algorithm):
@@ -31,10 +71,10 @@ class LDFS(Algorithm):
         visited.add(tuple(init_state))
         if self.finish:
             return
-        if init_state.estimation == 0:
+        if init_state.h == 0:
             self.finish = init_state
             return
-        if init_state.depth > 50:
+        if init_state.depth > 30:
             return
         for state in init_state.get_possible_moves():
             if tuple(state) not in visited:
@@ -48,61 +88,35 @@ class RBFS(Algorithm):
         super().__init__(*args, **kwargs)
 
     def find_finish_state(self, init_state):
-        self.finish = RBFS_search(init_state, float('inf'))
+        self.finish = self.search(init_state, float('inf'))
 
-    def find_finish(self, init_state, visited=None):
-        print(init_state.__repr__())
-        print(self.best_estimation, self.best_depth)
-        if visited is None:
-            visited = set()
-        visited.add(tuple(init_state))
-        if self.finish:
+    def search(self, state, f_limit):
+        # print(state.__repr__())
+        # print(f_limit, state.estimation, state.depth)
+        successors = []
+        if state.h == 0:
+            return state
+        children = state.get_possible_moves()
+        if not children:
             return
-        estimation = init_state.estimation
-        if estimation == 0:
-            self.finish = init_state
-            return
-        better_est = estimation <= self.best_estimation
-        if better_est or not better_est and init_state.depth < self.best_depth:
-            if better_est and init_state.depth >= self.best_depth:
-                self.best_depth = init_state.depth
-                self.best_estimation = estimation
-            for state in init_state.get_possible_moves():
-                if tuple(state) not in visited:
-                    self.find_finish(state, visited)
-        else:
-            return
+        count = 0
+        for child in children:
+            child.estimation_ = max((child.estimation, state.estimation))
+            successors.append(child)
+            count += 1
 
-
-def RBFS_search(state, f_limit):
-    print(state.__repr__())
-    print(f_limit, state.estimation, state.depth)
-    successors = []
-    # if state.depth > 50:
-    #     return
-    if state.h == 0:
-        return state
-    children = state.get_possible_moves()
-    if not children:
-        return
-    count = 0
-    for child in children:
-        child.estimation_ = max((child.estimation, state.estimation))
-        successors.append(child)
-        count += 1
-
-    while successors:
-        successors = list(sorted(successors, key=lambda x: x.estimation))
-        best_state = successors[0]
-        if best_state.estimation > f_limit:
-            best_state.update_branch_estimation()
-            return
-        if len(successors) > 1:
-            alternative = successors[1].estimation
-        else:
-            alternative = float('inf')
-        result = RBFS_search(best_state,
-                             min(f_limit,
-                                 alternative))
-        if result is not None:
-            return result
+        while successors:
+            successors = list(sorted(successors, key=lambda x: x.estimation))
+            best_state = successors[0]
+            if best_state.estimation > f_limit:
+                best_state.update_branch_estimation()
+                return
+            if len(successors) > 1:
+                alternative = successors[1].estimation
+            else:
+                alternative = float('inf')
+            result = self.search(best_state,
+                                 min(f_limit,
+                                     alternative))
+            if result is not None:
+                return result

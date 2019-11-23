@@ -87,22 +87,22 @@ def RBFS_search(state, f_limit):
         return
     count = 0
     for child in children:
-        successors.append(
-            (max((child.estimation, state.estimation)), count, child))
+        child.estimation_ = max((child.estimation, state.estimation))
+        successors.append(child)
         count += 1
 
     while successors:
-        successors.sort()
-        best_state = successors[0][2]
+        successors = list(sorted(successors, key=lambda x: x.estimation))
+        best_state = successors[0]
         if best_state.estimation > f_limit:
-            return None
+            best_state.update_branch_estimation()
+            return
         if len(successors) > 1:
-            alternative = successors[1][0]
+            alternative = successors[1].estimation
         else:
             alternative = float('inf')
         result = RBFS_search(best_state,
                              min(f_limit,
                                  alternative))
-        successors = successors[1:]
         if result is not None:
             return result

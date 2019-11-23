@@ -8,13 +8,14 @@ class State(list):
         self.null = SIZE ** 2 // 2
         self.prev_state = prev_state
         self.depth = depth
+        self.estimation_ = 0
         super().__init__(*args, **kwargs)
 
     @classmethod
     def move(cls, init_state, from_pos, to_pos):
         state = cls(init_state)
         state[from_pos], state[to_pos] = state[to_pos], state[from_pos]
-        state.prev_state = list(init_state)
+        state.prev_state = init_state
         state.null = to_pos
         state.depth = init_state.depth + 1
         return state
@@ -38,7 +39,7 @@ class State(list):
             return states
         res = []
         for state in states:
-            if list(state) != self.prev_state:
+            if not self.prev_state or self.prev_state and list(state) != list(self.prev_state):
                 res.append(state)
 
         return res
@@ -71,7 +72,6 @@ class State(list):
         state.depth = 0
         return state
 
-
     @property
     def h(self):
         sum_ = 0
@@ -84,7 +84,16 @@ class State(list):
 
     @property
     def estimation(self):
-        return self.depth + self.h
+        if not self.estimation_:
+            self.estimation_ = self.depth + self.h
+        return self.estimation_
+
+    def update_branch_estimation(self):
+        state = self
+        estimation = self.estimation
+        while state.prev_state:
+            state = state.prev_state
+            state.estimation_ = estimation
 
     def __repr__(self):
         repr = '\n'

@@ -7,7 +7,7 @@ from lab1.utils import Size, Position
 
 class Environment:
     def __init__(self, map_path, size: Size = Size(12, 12)):
-        self.size = size
+        SIZE = size
         self.map = self.read_map(map_path)
         self.agents = []
 
@@ -24,8 +24,8 @@ class Environment:
 
     def add_garbage(self):
         while True:
-            x, y = randint(1, self.size.len - 1), randint(1,
-                                                          self.size.width - 1)
+            x, y = randint(1, SIZE.len - 1), randint(1,
+                                                          SIZE.width - 1)
             if self.map[x][y] != choices.WALL:
                 self.map[x][y] = choices.GARBAGE
                 break
@@ -41,8 +41,8 @@ class Environment:
 
     def get_garbage_sum(self):
         sum_ = 0
-        for i in range(self.size.len):
-            for j in range(self.size.width):
+        for i in range(SIZE.len):
+            for j in range(SIZE.width):
                 if self.map[i][j] == choices.GARBAGE:
                     sum_ += 1
         return sum_

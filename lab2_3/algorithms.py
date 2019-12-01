@@ -2,7 +2,7 @@ from datetime import time
 from math import log, exp
 from random import random
 
-from lab2.states import State
+from lab2_3.states import State
 import sys
 from time import time
 
@@ -32,6 +32,7 @@ class Algorithm:
                 start = time()
                 self.find_finish_state(state)
                 end = time()
+            # print(self.finish)
             self.update_time_statistic(end - start)
             self.update_steps_statistic(self.finish.depth)
             # print('-' * 40)
@@ -128,7 +129,7 @@ class RBFS(Algorithm):
 
 
 class SA(Algorithm):
-    def __init__(self, *args, t0=10000, k_max=100000, **kwargs):
+    def __init__(self, *args, t0=10000, k_max=1000000, **kwargs):
         self.t0 = t0
         self.k_max = k_max
         super().__init__(*args, **kwargs)
@@ -146,6 +147,7 @@ class SA(Algorithm):
         return 1 / (1 + exp(de) / t)
 
     def search(self, init_state):
+        depths = {tuple(init_state): 0}
         state = init_state
         k = 1
         while k <= self.k_max:
@@ -154,11 +156,22 @@ class SA(Algorithm):
             new_state = state.new_state()
             e = state.h
             e_new = new_state.h
-            if new_state.h == 0:
-                return new_state
             p = self.possibility(e_new - e, t)
+            move = False
             if e_new < e:
-                state = new_state
+                move = True
             elif random() < p:
+                move = True
+            if move:
+                s_depth = depths.get(tuple(state))
+                ns_depth = depths.get(tuple(new_state), float('inf'))
+                if ns_depth > s_depth + 1:
+                    depths[tuple(new_state)] = s_depth + 1
+                    new_state.depth = s_depth + 1
                 state = new_state
+            if state.h == 0:
+                return state
             k += 1
+        # state.depth = depths[tuple(state)]
+        # print(state.depth)
+        # return state

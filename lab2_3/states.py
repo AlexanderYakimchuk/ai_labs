@@ -1,6 +1,6 @@
 import random
 
-from lab2.conf import SIZE
+from lab2_3.conf import SIZE
 
 
 class State(list):
@@ -104,57 +104,3 @@ class State(list):
             repr += ' '.join(
                 [str(self[SIZE * i + j] or ' ') for j in range(SIZE)]) + '\n'
         return repr
-
-#   1 2
-# 3 4 5
-# 6 7 8
-#
-#
-# 3 1 2
-#   4 5
-# 6 7 8
-#
-#
-# 3 1 2
-# 6 4 5
-#   7 8
-#
-#
-# 3 1 2
-# 6 4 5
-# 7   8
-#
-#
-# 3 1 2
-# 6   5
-# 7 4 8
-#
-#
-# 3 1 2
-#   6 5
-# 7 4 8
-#
-#
-#   1 2
-# 3 6 5
-# 7 4 8
-#
-#
-# 1   2
-# 3 6 5
-# 7 4 8
-#
-#
-# 1 6 2
-# 3   5
-# 7 4 8
-#
-#
-# 1 6 2
-#   3 5
-# 7 4 8
-#
-#
-# 1 6 2
-# 7 3 5
-#   4 8

@@ -1,9 +1,9 @@
-from lab2.algorithms import RBFS, LDFS, SA
-from lab2.states import State
+from lab2_3.algorithms import RBFS, LDFS, SA
+from lab2_3.states import State
 
 if __name__ == "__main__":
-    iters = 3
-    algs = (SA, )
+    iters = 20
+    algs = (RBFS, LDFS, SA, )
     for alg_cls in algs:
         alg = alg_cls(iters)
         alg.run()

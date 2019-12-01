@@ -39,10 +39,14 @@ class State(list):
             return states
         res = []
         for state in states:
-            if not self.prev_state or self.prev_state and list(state) != list(self.prev_state):
+            if not self.prev_state or self.prev_state and list(state) != list(
+                    self.prev_state):
                 res.append(state)
 
         return res
+
+    def new_state(self):
+        return random.choice(self.get_possible_moves())
 
     @classmethod
     def get_init_state(cls):
@@ -100,7 +104,6 @@ class State(list):
             repr += ' '.join(
                 [str(self[SIZE * i + j] or ' ') for j in range(SIZE)]) + '\n'
         return repr
-
 
 #   1 2
 # 3 4 5

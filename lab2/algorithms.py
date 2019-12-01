@@ -1,8 +1,12 @@
 from datetime import time
+from math import log, exp
+from random import random
 
 from lab2.states import State
 import sys
 from time import time
+
+
 # sys.setrecursionlimit(2000)
 
 
@@ -24,9 +28,10 @@ class Algorithm:
         for _ in range(self.iters):
             self.finish = None
             state = State.get_valid_init_state()
-            start = time()
-            self.find_finish_state(state)
-            end = time()
+            while not self.finish:
+                start = time()
+                self.find_finish_state(state)
+                end = time()
             self.update_time_statistic(end - start)
             self.update_steps_statistic(self.finish.depth)
             # print('-' * 40)
@@ -40,6 +45,7 @@ class Algorithm:
 
     def update_time_statistic(self, time):
         self.total_time += time
+
         self.best_time = min((self.best_time, time))
         self.worth_time = max((self.worth_time, time))
 
@@ -57,7 +63,6 @@ class Algorithm:
         print(f'Best steps: {self.best_steps}')
         print(f'Worth steps: {self.worth_steps}')
         print('-' * 40)
-
 
 
 class LDFS(Algorithm):
@@ -120,3 +125,40 @@ class RBFS(Algorithm):
                                      alternative))
             if result is not None:
                 return result
+
+
+class SA(Algorithm):
+    def __init__(self, *args, t0=10000, k_max=100000, **kwargs):
+        self.t0 = t0
+        self.k_max = k_max
+        super().__init__(*args, **kwargs)
+
+    def find_finish_state(self, init_state):
+        self.finish = self.search(init_state)
+
+    def temperature(self, k):
+        return self.t0 / k # Cauchy
+        # return self.t0 / log(1 + k)  # Boltzmann
+
+    @classmethod
+    def possibility(cls, de, t):
+        # return exp(-1 * de / t)
+        return 1 / (1 + exp(de) / t)
+
+    def search(self, init_state):
+        state = init_state
+        k = 1
+        while k <= self.k_max:
+            # print(state)
+            t = self.temperature(k)
+            new_state = state.new_state()
+            e = state.h
+            e_new = new_state.h
+            if new_state.h == 0:
+                return new_state
+            p = self.possibility(e_new - e, t)
+            if e_new < e:
+                state = new_state
+            elif random() < p:
+                state = new_state
+            k += 1

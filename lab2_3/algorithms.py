@@ -39,6 +39,16 @@ class Algorithm:
             # print(self.finish)
             # print(self.finish.depth)
 
+    def get_path(self):
+        state = self.finish
+        states = []
+
+        while state.prev_state:
+            states.append(state)
+            state = state.prev_state
+
+        return states[::-1]
+
     def update_steps_statistic(self, steps):
         self.total_steps += steps
         self.best_steps = min((self.best_steps, steps))

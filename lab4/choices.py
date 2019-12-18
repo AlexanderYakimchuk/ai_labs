@@ -1,0 +1,10 @@
+VIY = 'v '
+P_VIY = 'pv'  # possible room with viy
+WALL = 'w '
+LADY = 'l '
+P_LADY = 'pl'  # possible room with lady
+GOLD = 'g '
+EMPTY = '  '
+SAFE = 's '
+ANY = '? '
+AGENT = 'a '

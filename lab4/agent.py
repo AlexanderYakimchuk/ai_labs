@@ -38,6 +38,7 @@ class Agent:
         self.update_positions(self.check_pos(Position(self.x - 1, self.y)))
         self.update_positions(self.check_pos(Position(self.x, self.y + 1)))
         self.update_positions(self.check_pos(Position(self.x, self.y - 1)))
+        self.update_viy_pos()
 
     def update_pos(self, pos, item):
         # if item == ANY and self.agent_map[pos] != WALL and self.agent_map[
@@ -45,8 +46,17 @@ class Agent:
         #     self.agent_map[pos] = SAFE
         if self.agent_map[pos] == ANY:
             self.agent_map[pos] = item
-        elif self.agent_map[pos] == P_VIY and item == P_VIY:
-            self.agent_map[pos] = VIY
+        # elif self.agent_map[pos] == P_VIY and item == P_VIY:
+        #     self.agent_map[pos] = VIY
+
+    def update_viy_pos(self):
+        positions = []
+        for i in range(self.agent_map.map_size.height):
+            for j in range(self.agent_map.map_size.width):
+                if self.agent_map[Position(i, j)] == P_VIY:
+                    positions.append(Position(i, j))
+        if len(positions) == 1:
+            self.agent_map[positions[0]] = VIY
 
     def update_positions(self, item):
         self.update_pos(Position(self.x + 1, self.y), item)
@@ -59,7 +69,7 @@ class Agent:
         Analizes position on world map and returns item for agent map
         """
         item = self.world_map[pos]
-        if item == VIY:
+        if item == VIY and self.agent_map[pos] != VIY:
             return P_VIY
         elif item == LADY:
             return P_LADY
@@ -103,7 +113,7 @@ class Agent:
         self.agent_map.agent_pos = Position(self.x, self.y)
 
     def kick(self, pos):
-        if self.world_map[pos] == VIY:
+        if self.world_map[pos] == VIY and self.can_kick:
             self.world_map[pos] = EMPTY
             for i in range(self.agent_map.map_size.height):
                 for j in range(self.agent_map.map_size.width):

@@ -1,8 +1,8 @@
 from lab2_3.algorithms import RBFS, LDFS, SA
 
 if __name__ == "__main__":
-    iters = 1
-    algs = (SA,)
+    iters = 10
+    algs = (RBFS, LDFS, SA,)
     for alg_cls in algs:
         alg = alg_cls(iters)
         alg.run()
